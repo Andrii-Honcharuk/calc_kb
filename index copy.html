@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-5NCEZ3H183"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-5NCEZ3H183");
+    </script>
+    <style>
+      /* CSS для стилізації форми */
+      .form-container {
+        width: 300px;
+        margin: 20px auto;
+      }
+
+      .form-container input[type="text"],
+      .form-container input[type="number"],
+      .form-container select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+      }
+
+      .form-container button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      .form-container button:hover {
+        background-color: #45a049;
+      }
+
+      /* CSS для таблиці результатів */
+      #results-table {
+        width: auto;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+
+      #results-table th,
+      #results-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #results-table th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <form id="score-form">
+        <label for="ukrainian">Українська мова:</label>
+        <input
+          type="number"
+          id="ukrainian"
+          name="ukrainian"
+          min="100"
+          max="200"
+          required
+        />
+
+        <label for="math">Математика:</label>
+        <input
+          type="number"
+          id="math"
+          name="math"
+          min="100"
+          max="200"
+          required
+        />
+
+        <label for="math">Математика:</label>
+        <input
+          type="number"
+          id="math"
+          name="math"
+          min="100"
+          max="200"
+          required
+        />
+
+        <label for="third-subject">Третій предмет:</label>
+        <select id="third-subject" name="third-subject" required>
+          <option value="history">Історія України</option>
+          <option value="foreignLanguage">Іноземна мова</option>
+          <option value="biology">Біологія</option>
+          <option value="physics">Фізика</option>
+          <option value="chemistry">Хімія</option>
+        </select>
+
+        <input
+          type="number"
+          id="third-score"
+          name="third-score"
+          min="100"
+          max="200"
+          required
+        />
+
+        <button type="submit">Розрахувати</button>
+      </form>
+    </div>
+
+    <div id="results-container">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>Спеціальність</th>
+            <th>Конкурсний бал</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+
+    <script>
+      // Код JavaScript
+
+      // Коефіцієнти для Української мови
+      const k1 = [
+        0.5, 0.5, 0.4, 0.4, 0.3, 0.35, 0.4, 0.35, 0.35, 0.5, 0.4, 0.4, 0.4,
+        0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.35, 0.3,
+        0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3,
+        0.3, 0.3, 0.35, 0.35, 0.35, 0.4, 0.4, 0.3, 0.4, 0.3, 0.3,
+      ];
+
+      // Коефіцієнти для Математики
+      const k2 = [
+        0.2, 0.2, 0.3, 0.3, 0.35, 0.4, 0.3, 0.4, 0.4, 0.25, 0.3, 0.3, 0.3, 0.4,
+        0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.25, 0.35, 0.5, 0.5, 0.5,
+        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.4, 0.4,
+        0.4, 0.4, 0.3, 0.3, 0.5, 0.3, 0.4, 0.4,
+      ];
+
+      // Коефіцієнти для третього предмета
+      const k3 = {
+        history: [
+          0.3, 0.3, 0.3, 0.3, 0.35, 0.25, 0.3, 0.25, 0.25, 0.25, 0.3, 0.3, 0.3,
+          0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.4, 0.35,
+          0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+          0.2, 0.3, 0.25, 0.25, 0.25, 0.3, 0.3, 0.2, 0.3, 0.3, 0.3,
+        ],
+        foreignLanguage: [
+          0.4, 0.4, 0.5, 0.5, 0.3, 0.25, 0.3, 0.3, 0.25, 0.25, 0.4, 0.4, 0.4,
+          0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.4, 0.3,
+          0.3, 0.3, 0.3, 0.3, 0.3, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25,
+          0.25, 0.25, 0.25, 0.35, 0.25, 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.5,
+          0.5,
+        ],
+        biology: [
+          0.25, 0.25, 0.25, 0.25, 0.5, 0.3, 0.3, 0.3, 0.25, 0.2, 0.2, 0.2, 0.2,
+          0.2, 0.2, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.2, 0.25, 0.4, 0.2, 0.2,
+          0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.2, 0.2, 0.5,
+          0.5, 0.5, 0.25, 0.3, 0.35, 0.2, 0.2, 0.2, 0.2,
+        ],
+        physics: [
+          0.2, 0.2, 0.25, 0.25, 0.3, 0.4, 0.3, 0.3, 0.25, 0.2, 0.2, 0.2, 0.2,
+          0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.25, 0.35, 0.4,
+          0.4, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.5, 0.5, 0.2, 0.5, 0.5, 0.5, 0.5,
+          0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.5, 0.2, 0.2, 0.2,
+        ],
+        chemistry: [
+          0.2, 0.2, 0.25, 0.25, 0.3, 0.3, 0.3, 0.3, 0.25, 0.2, 0.2, 0.2, 0.2,
+          0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.25, 0.4, 0.2, 0.2,
+          0.2, 0.2, 0.2, 0.2, 0.5, 0.2, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.5, 0.3,
+          0.35, 0.35, 0.25, 0.3, 0.25, 0.2, 0.2, 0.2, 0.2,
+        ],
+      };
+
+      // Функція розрахунку конкурсного балу
+      function calculateScores(event) {
+        event.preventDefault();
+
+        const ukrainianInput = document.getElementById("ukrainian");
+        const mathInput = document.getElementById("math");
+        const thirdSubjectSelect = document.getElementById("third-subject");
+        const thirdScoreInput = document.getElementById("third-score");
+        const resultsBody = document.getElementById("results-body");
+
+        const scores = {
+          ukrainian: Number(ukrainianInput.value),
+          math: Number(mathInput.value),
+          third: Number(thirdScoreInput.value),
+        };
+
+        const thirdSubject = thirdSubjectSelect.value;
+
+        const specializations = [
+          {
+            name: "014.01 Середня освіта (Українська мова і література, англійська мова)",
+            k1Index: 0,
+            k2Index: 0,
+          },
+          {
+            name: "014.01 Середня освіта (Українська мова і література)",
+            k1Index: 1,
+            k2Index: 1,
+          },
+          {
+            name: "014.021 Середня освіта. Англійська мова і література",
+            k1Index: 2,
+            k2Index: 2,
+          },
+          {
+            name: "014.028 Середня освіта (Мови і літератури (польська, українська))",
+            k1Index: 3,
+            k2Index: 3,
+          },
+          {
+            name: "014.05 Середня освіта (Біологія та здоров’я людини)",
+            k1Index: 4,
+            k2Index: 4,
+          },
+          {
+            name: "014.10 Середня освіта. Трудове навчання та технології, інформатика",
+            k1Index: 5,
+            k2Index: 5,
+          },
+          {
+            name: "014.11 Середня освіта (фізична культура)",
+            k1Index: 6,
+            k2Index: 6,
+          },
+          {
+            name: "015.36 Професійна освіта. Транспорт (Обслуговування та ремонт автомобілів)",
+            k1Index: 7,
+            k2Index: 7,
+          },
+          { name: "022 Дизайн", k1Index: 8, k2Index: 8 },
+          {
+            name: "035.01 Філологія (Українська мова та література)",
+            k1Index: 9,
+            k2Index: 9,
+          },
+          {
+            name: "035.033 Польська мова і література, друга мова – англійська",
+            k1Index: 10,
+            k2Index: 10,
+          },
+          {
+            name: "035.041 Германська філологія та перекладознавство: англійська мова та друга іноземна мова",
+            k1Index: 11,
+            k2Index: 11,
+          },
+          { name: "035.10 Прикладна лінгвістика", k1Index: 12, k2Index: 12 },
+          {
+            name: "051 Економіка і аналітика бізнесу",
+            k1Index: 13,
+            k2Index: 13,
+          },
+          { name: "051 Економічна кібернетика", k1Index: 14, k2Index: 14 },
+          {
+            name: "051 HR-інжиніринг у бізнес-економіці",
+            k1Index: 15,
+            k2Index: 15,
+          },
+          { name: "052 Політологія", k1Index: 16, k2Index: 16 },
+          { name: "053 Психологія", k1Index: 17, k2Index: 17 },
+          { name: "071 Облік і оподаткування", k1Index: 18, k2Index: 18 },
+          {
+            name: "072 Фінанси, банківська справа, страхування та фондовий ринок",
+            k1Index: 19,
+            k2Index: 19,
+          },
+          { name: "073 Менеджмент", k1Index: 20, k2Index: 20 },
+          { name: "075 Маркетинг", k1Index: 21, k2Index: 21 },
+          { name: "076 Підприємництво та торгівля", k1Index: 22, k2Index: 22 },
+          { name: "081 Право", k1Index: 23, k2Index: 23 },
+          { name: "101 Екологія", k1Index: 24, k2Index: 24 },
+          {
+            name: "121 Інженерія програмного забезпечення",
+            k1Index: 25,
+            k2Index: 25,
+          },
+          { name: "122 Комп’ютерні науки", k1Index: 26, k2Index: 26 },
+          { name: "123 Комп’ютерна інженерія", k1Index: 27, k2Index: 27 },
+          {
+            name: "125 Кібербезпека та захист інформації",
+            k1Index: 28,
+            k2Index: 28,
+          },
+          {
+            name: "126 Інформаційні системи та технології",
+            k1Index: 29,
+            k2Index: 29,
+          },
+          { name: "131 Технології машинобудування", k1Index: 30, k2Index: 30 },
+          {
+            name: "132 Відновлення та технічний сервіс автомобілів",
+            k1Index: 31,
+            k2Index: 31,
+          },
+          {
+            name: "133 Робототехнічні та мехатронні системи галузі",
+            k1Index: 32,
+            k2Index: 32,
+          },
+          { name: "133 Агропереробка та інжинірінг", k1Index: 33, k2Index: 33 },
+          {
+            name: "141 Електроенергетика, електротехніка та електромеханіка",
+            k1Index: 34,
+            k2Index: 34,
+          },
+          {
+            name: "161 Хімічні технології та інженерія",
+            k1Index: 35,
+            k2Index: 35,
+          },
+          {
+            name: "172 Електронні інформаційно-комунікаційні системи та мережі",
+            k1Index: 36,
+            k2Index: 36,
+          },
+          {
+            name: "174 Автоматизація, комп’ютерно-інтегровані технології та робототехніка",
+            k1Index: 37,
+            k2Index: 37,
+          },
+          {
+            name: "182 Конструювання та технології швейних виробів",
+            k1Index: 38,
+            k2Index: 38,
+          },
+          {
+            name: "182 Індустрія моди в легкій промисловості",
+            k1Index: 39,
+            k2Index: 39,
+          },
+          { name: "208 Агроінженерія", k1Index: 40, k2Index: 40 },
+          {
+            name: "227 Фізична терапія, ерготерапія",
+            k1Index: 41,
+            k2Index: 41,
+          },
+          { name: "227 Ерготерапія", k1Index: 42, k2Index: 42 },
+          {
+            name: "231 Соціальна робота. Соціальна педагогіка та коучинг",
+            k1Index: 43,
+            k2Index: 43,
+          },
+          { name: "241 Готельно-ресторанна справа", k1Index: 44, k2Index: 44 },
+          { name: "242 Туризм", k1Index: 45, k2Index: 45 },
+          { name: "274 Автомобільний транспорт", k1Index: 46, k2Index: 46 },
+          {
+            name: "291 Міжнародні відносини, суспільні комунікації та регіональні студії",
+            k1Index: 47,
+            k2Index: 47,
+          },
+          {
+            name: "292 Міжнародні економічні відносини",
+            k1Index: 48,
+            k2Index: 48,
+          },
+          {
+            name: "292 Міжнародна логістика та митна справа",
+            k1Index: 49,
+            k2Index: 49,
+          },
+        ];
+
+        // Очищаємо таблицю результатів
+        resultsBody.innerHTML = "";
+
+        // Розраховуємо конкурсний бал для кожної спеціальності
+        specializations.forEach((specialization) => {
+          const k1Value = k1[specialization.k1Index];
+          const k2Value = k2[specialization.k2Index];
+          const k3Value = k3[thirdSubject][specialization.k2Index];
+
+          const competitionScore =
+            (k1Value * scores.ukrainian +
+              k2Value * scores.math +
+              k3Value * scores.third) /
+            (k1Value + k2Value + k3Value);
+
+          // Створюємо рядок таблиці з результатом
+          const row = document.createElement("tr");
+
+          const specializationCell = document.createElement("td");
+          specializationCell.textContent = specialization.name;
+          row.appendChild(specializationCell);
+
+          const scoreCell = document.createElement("td");
+          scoreCell.textContent = competitionScore.toFixed(3);
+          row.appendChild(scoreCell);
+
+          resultsBody.appendChild(row);
+        });
+      }
+
+      const scoreForm = document.getElementById("score-form");
+      scoreForm.addEventListener("submit", calculateScores);
+    </script>
+  </body>
+</html>
