@@ -1027,73 +1027,82 @@ function calculate() {
     return;
   }
 
-  const results = specialties.map((specialty) => {
-    const K1 = specialty.K1;
-    const K2 = specialty.K2;
-    const K3 = specialty.K3;
-    const K4 = specialty.K4[subject4] || 0;
-    const KT = specialty.KT;
-
+  let results = specialties.map((spec) => {
+    const K1 = spec.K1;
+    const K2 = spec.K2;
+    const K3 = spec.K3;
+    const K4 = spec.K4[subject4];
+    const KT = spec.KT;
     const KB =
       (K1 * P1 + K2 * P2 + K3 * P3 + K4 * P4 + KT * TK) /
       (K1 + K2 + K3 + K4 + KT);
-
     return {
-      код: specialty.Код,
-      освітняПрограма: specialty["Освітня програма"],
-      конкурснийБал: KB.toFixed(2),
+      Код: spec.Код,
+      "Освітня програма": spec["Освітня програма"],
+      "Конкурсний бал": KB,
     };
   });
 
-  displayResults(results);
-}
+  results.sort((a, b) => b["Конкурсний бал"] - a["Конкурсний бал"]);
 
-function displayResults(results) {
-  const table = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Код</th>
-                    <th>Освітня програма</th>
-                    <th onclick="sortTable()">Конкурсний бал</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${results
-                  .map(
-                    (result) => `
-                    <tr>
-                        <td>${result.код}</td>
-                        <td>${result.освітняПрограма}</td>
-                        <td class="${getClassForScore(result.конкурснийБал)}">${
-                      result.конкурснийБал
-                    }</td>
-                    </tr>
-                `
-                  )
-                  .join("")}
-            </tbody>
-        </table>
+  let tableHtml = `
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Код</th>
+            <th onclick="sortTable(1)">Освітня програма</th>
+            <th onclick="sortTable(2)">Конкурсний бал</th>
+          </tr>
+        </thead>
+        <tbody>
     `;
 
-  document.getElementById("result").innerHTML = table;
+  results.forEach((result) => {
+    let warningHtml = "";
+    if (
+      ["081", "291", "292"].includes(result.Код) &&
+      result["Конкурсний бал"] < 150
+    ) {
+      warningHtml = `
+                <span class="tooltip warning">!
+                  <span class="tooltiptext">Для вступу на цю конкурсну пропозицію мінімальний бал має бути більше 150</span>
+                </span>
+            `;
+    } else if (result["Конкурсний бал"] < 130) {
+      warningHtml = `
+                <span class="tooltip warning">⚠️
+                  <span class="tooltiptext">Для можливості претендувати на навчання за кошти Держ. бюджету КБ має бути більше 130</span>
+                </span>
+            `;
+    }
+
+    tableHtml += `
+          <tr>
+            <td>${result.Код}</td>
+            <td>${result["Освітня програма"]}</td>
+            <td>${result["Конкурсний бал"].toFixed(2)}${warningHtml}</td>
+          </tr>
+        `;
+  });
+
+  tableHtml += "</tbody></table>";
+
+  document.getElementById("result").innerHTML = tableHtml;
 }
 
-function getClassForScore(score) {
-  if (score < 100) return "low-score";
-  if (score < 130) return "medium-score";
-  return "";
-}
-
-function sortTable() {
+function sortTable(columnIndex) {
   const table = document.querySelector("table tbody");
   const rows = Array.from(table.rows);
 
   rows.sort((rowA, rowB) => {
-    const cellA = parseFloat(rowA.cells[2].innerText);
-    const cellB = parseFloat(rowB.cells[2].innerText);
+    const cellA = rowA.cells[columnIndex].innerText;
+    const cellB = rowB.cells[columnIndex].innerText;
 
-    return cellB - cellA;
+    if (columnIndex === 2) {
+      // Конкурсний бал
+      return parseFloat(cellB) - parseFloat(cellA);
+    }
+    return cellA.localeCompare(cellB);
   });
 
   while (table.firstChild) {
