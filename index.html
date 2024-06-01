@@ -20,10 +20,14 @@
         display: block;
         margin-bottom: 5px;
       }
-      input,
-      select {
-        width: 100%;
+      input {
+        width: 220px;
         padding: 8px;
+      }
+      select {
+        width: 240px;
+        padding: 8px;
+        font-size: 16px;
       }
       button {
         padding: 10px 20px;
@@ -48,47 +52,52 @@
       td {
         border: 1px solid #ddd;
         padding: 8px;
-        text-align: left;
+        text-align: center;
       }
       th {
         background-color: #f2f2f2;
         cursor: pointer;
       }
-      .low-score {
-        background-color: red;
-      }
-      .medium-score {
-        background-color: yellow;
-      }
-      .warning {
-        color: red;
-        font-weight: bold;
-        margin-left: 10px;
+      .osvpr {
+        text-align: left;
       }
       .tooltip {
         position: relative;
         display: inline-block;
-        border-bottom: 1px dotted black;
+        padding-left: 6px;
+        padding-right: 6px;
       }
       .tooltip .tooltiptext {
         visibility: hidden;
         width: 220px;
-        background-color: #f9dcdc;
-        color: #000;
+        background-color: #f44336;
+        color: #fff;
         text-align: center;
         border-radius: 6px;
         padding: 5px;
         position: absolute;
         z-index: 1;
-        bottom: 125%; /* Position the tooltip */
+        bottom: 125%; /* Position above the element */
         left: 50%;
-        margin-left: -110px;
+        margin-left: -110px; /* Center the tooltip */
         opacity: 0;
         transition: opacity 0.3s;
       }
       .tooltip:hover .tooltiptext {
         visibility: visible;
         opacity: 1;
+      }
+      .warning {
+        color: red;
+        font-weight: bold;
+      }
+      .yellow-warning {
+        color: #ffcc00;
+        font-weight: bold;
+      }
+      .red-warning {
+        color: red;
+        font-weight: bold;
       }
     </style>
   </head>

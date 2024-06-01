@@ -1040,6 +1040,7 @@ function calculate() {
       Код: spec.Код,
       "Освітня програма": spec["Освітня програма"],
       "Конкурсний бал": KB,
+      KTRequired: KT > 0,
     };
   });
 
@@ -1064,13 +1065,19 @@ function calculate() {
       result["Конкурсний бал"] < 150
     ) {
       warningHtml = `
-                <span class="tooltip warning">!
+                <span class="tooltip warning"> ❗ 
                   <span class="tooltiptext">Для вступу на цю конкурсну пропозицію мінімальний бал має бути більше 150</span>
+                </span>
+            `;
+    } else if (result["KTRequired"] && TK === 0) {
+      warningHtml = `
+                <span class="tooltip warning">❌
+                  <span class="tooltiptext">Для даної конкурсної пропозиції необхідні результати творчого конкурсу</span>
                 </span>
             `;
     } else if (result["Конкурсний бал"] < 130) {
       warningHtml = `
-                <span class="tooltip warning">⚠️
+                <span class="tooltip yellow-warning">⚠️
                   <span class="tooltiptext">Для можливості претендувати на навчання за кошти Держ. бюджету КБ має бути більше 130</span>
                 </span>
             `;
@@ -1078,9 +1085,11 @@ function calculate() {
 
     tableHtml += `
           <tr>
-            <td>${result.Код}</td>
-            <td>${result["Освітня програма"]}</td>
-            <td>${result["Конкурсний бал"].toFixed(2)}${warningHtml}</td>
+            <td class="kod">${result.Код}</td>
+            <td class="osvpr">${result["Освітня програма"]}</td>
+            <td class="bal">${result["Конкурсний бал"].toFixed(
+              2
+            )}${warningHtml}</td>
           </tr>
         `;
   });
