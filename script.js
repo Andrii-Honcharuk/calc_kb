@@ -1027,16 +1027,7 @@ function calculate() {
     return;
   }
 
-  let results = `
-        <table>
-            <tr>
-                <th>Код</th>
-                <th>Освітня програма</th>
-                <th>Конкурсний бал</th>
-            </tr>
-    `;
-
-  specialties.forEach((specialty) => {
+  const results = specialties.map((specialty) => {
     const K1 = specialty.K1;
     const K2 = specialty.K2;
     const K3 = specialty.K3;
@@ -1047,15 +1038,67 @@ function calculate() {
       (K1 * P1 + K2 * P2 + K3 * P3 + K4 * P4 + KT * TK) /
       (K1 + K2 + K3 + K4 + KT);
 
-    results += `
-              <tr>
-                  <td>${specialty.Код}</td>
-                  <td>${specialty["Освітня програма"]}</td>
-                  <td>${KB.toFixed(3)}</td>
-              </tr>
-          `;
+    return {
+      код: specialty.Код,
+      освітняПрограма: specialty["Освітня програма"],
+      конкурснийБал: KB.toFixed(2),
+    };
   });
 
-  results += `</table>`;
-  document.getElementById("result").innerHTML = results;
+  displayResults(results);
+}
+
+function displayResults(results) {
+  const table = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Код</th>
+                    <th>Освітня програма</th>
+                    <th onclick="sortTable()">Конкурсний бал</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${results
+                  .map(
+                    (result) => `
+                    <tr>
+                        <td>${result.код}</td>
+                        <td>${result.освітняПрограма}</td>
+                        <td class="${getClassForScore(result.конкурснийБал)}">${
+                      result.конкурснийБал
+                    }</td>
+                    </tr>
+                `
+                  )
+                  .join("")}
+            </tbody>
+        </table>
+    `;
+
+  document.getElementById("result").innerHTML = table;
+}
+
+function getClassForScore(score) {
+  if (score < 100) return "low-score";
+  if (score < 130) return "medium-score";
+  return "";
+}
+
+function sortTable() {
+  const table = document.querySelector("table tbody");
+  const rows = Array.from(table.rows);
+
+  rows.sort((rowA, rowB) => {
+    const cellA = parseFloat(rowA.cells[2].innerText);
+    const cellB = parseFloat(rowB.cells[2].innerText);
+
+    return cellB - cellA;
+  });
+
+  while (table.firstChild) {
+    table.removeChild(table.firstChild);
+  }
+
+  rows.forEach((row) => table.appendChild(row));
 }
