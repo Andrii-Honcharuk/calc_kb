@@ -1,143 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Калькулятор Конкурсного Балу</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      .container {
-        max-width: 600px;
-        margin: auto;
-      }
-      .form-group {
-        margin-bottom: 15px;
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-      }
-      input {
-        width: 220px;
-        padding: 8px;
-      }
-      select {
-        width: 240px;
-        padding: 8px;
-        font-size: 16px;
-      }
-      button {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      .result {
-        margin-top: 20px;
-        font-size: 18px;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-      }
-      th {
-        background-color: #f2f2f2;
-        cursor: pointer;
-      }
-      .osvpr {
-        text-align: left;
-      }
-      .tooltip {
-        position: relative;
-        display: inline-block;
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-      .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 220px;
-        background-color: #f44336;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px;
-        position: absolute;
-        z-index: 1;
-        bottom: 125%; /* Position above the element */
-        left: 50%;
-        margin-left: -110px; /* Center the tooltip */
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .tooltip:hover .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-      }
-      .warning {
-        color: red;
-        font-weight: bold;
-      }
-      .yellow-warning {
-        color: #ffcc00;
-        font-weight: bold;
-      }
-      .red-warning {
-        color: red;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Калькулятор абітурієнта</h1>
-      <div class="form-group">
-        <label for="P1">Українська мова (П1)</label>
-        <input type="number" id="P1" min="100" max="200" required />
-      </div>
-      <div class="form-group">
-        <label for="P2">Математика (П2)</label>
-        <input type="number" id="P2" min="100" max="200" required />
-      </div>
-      <div class="form-group">
-        <label for="P3">Історія України (П3)</label>
-        <input type="number" id="P3" min="100" max="200" required />
-      </div>
-      <div class="form-group">
-        <label for="subject4">Четвертий предмет</label>
-        <select id="subject4">
-          <option value="іноземна мова">Іноземна мова</option>
-          <option value="біологія">Біологія</option>
-          <option value="фізика">Фізика</option>
-          <option value="хімія">Хімія</option>
-          <option value="українська література">Українська література</option>
-          <option value="географія">Географія</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="P4">Оцінка з четвертого предмету (П4)</label>
-        <input type="number" id="P4" min="100" max="200" required />
-      </div>
-      <div class="form-group">
-        <label for="TK">Оцінка творчого конкурсу (ТК) (якщо є)</label>
-        <input type="number" id="TK" min="0" max="200" />
-      </div>
-      <button onclick="calculate()">Розрахувати КБ</button>
-      <div class="result" id="result"></div>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор Конкурсного Балу</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 220px;
+      padding: 8px;
+    }
+
+    select {
+      width: 240px;
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      cursor: pointer;
+    }
+
+    .osvpr {
+      text-align: left;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: #f44336;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      /* Position above the element */
+      left: 50%;
+      margin-left: -110px;
+      /* Center the tooltip */
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+
+    .yellow-warning {
+      color: #ffcc00;
+      font-weight: bold;
+    }
+
+    .red-warning {
+      color: red;
+      font-weight: bold;
+    }
+
+    /*CalcIcon*/
+    .calculator-btn {
+      background-color: #fff;
+      padding: 0px;
+    }
+
+    #calculator-info-btn {
+      /* background-color: #007bff; */
+      color: white;
+      border: none;
+      border-radius: 50%;
+      /* padding: 10px; */
+      font-size: 20px;
+      cursor: pointer;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #calculator-info-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 300px;
+      background-color: #f44336;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      bottom: 50px;
+      /* Під кнопкою */
+      right: 10px;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    #calculator-info-btn:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Модальне вікно */
+    .modal {
+      display: none;
+      /* Приховано за замовчуванням */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      /* Напівпрозорий фон */
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+      color: black;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Калькулятор абітурієнта</h1>
+    <div class="form-group">
+      <label for="P1">Українська мова (П1)</label>
+      <input type="number" id="P1" min="100" max="200" required />
     </div>
-    <script src="script.js"></script>
-  </body>
+    <div class="form-group">
+      <label for="P2">Математика (П2)</label>
+      <input type="number" id="P2" min="100" max="200" required />
+    </div>
+    <div class="form-group">
+      <label for="P3">Історія України (П3)</label>
+      <input type="number" id="P3" min="100" max="200" required />
+    </div>
+    <div class="form-group">
+      <label for="subject4">Четвертий предмет</label>
+      <select id="subject4">
+        <option value="іноземна мова">Іноземна мова</option>
+        <option value="біологія">Біологія</option>
+        <option value="фізика">Фізика</option>
+        <option value="хімія">Хімія</option>
+        <option value="українська література">Українська література</option>
+        <option value="географія">Географія</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="P4">Оцінка з четвертого предмету (П4)</label>
+      <input type="number" id="P4" min="100" max="200" required />
+    </div>
+    <div class="form-group">
+      <label for="TK">Оцінка творчого конкурсу (ТК) (якщо є)</label>
+      <input type="number" id="TK" min="0" max="200" />
+    </div>
+    <button onclick="calculate()">Розрахувати КБ</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <div id="calculation-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Деталі розрахунку КБ</h2>
+      <div id="modal-details"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+
 </html>
